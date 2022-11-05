@@ -1,14 +1,13 @@
 'use strict';
-
-let todoControl = document.querySelector('.todo-control'),
+let todoData = [];
+const todoControl = document.querySelector('.todo-control'),
     headerInput = document.querySelector('.header-input'),
     todoList = document.querySelector('.todo-list'),
     todoCompleted = document.querySelector('.todo-completed'),
-    todoData = [],
     render = function () {
         todoList.innerHTML = '';
         todoCompleted.innerHTML = '';
-        todoData.forEach(function (item) {
+        todoData.forEach(function (item, index) {
             const li = document.createElement('li');
             li.classList.add('todo-item');
             li.innerHTML = '<span class="text-todo">' + item.text + '</span>' +
@@ -16,6 +15,7 @@ let todoControl = document.querySelector('.todo-control'),
                 '<button class="todo-remove"></button>' +
                 '<button class="todo-complete"></button>' +
                 '</div>';
+
             if (item.completed) {
                 todoCompleted.append(li);
             } else {
@@ -24,12 +24,8 @@ let todoControl = document.querySelector('.todo-control'),
 
             li.querySelector('.todo-remove').addEventListener('click', function () {
                 li.remove();
-                for (let i = 0; i < todoData.length; i++) {
-                    if (todoData[i] === item) {
-                        todoData.splice(i, 1);
-                    }
-                }
-                localStorage.removeItem('toDo', JSON.stringify(todoData));
+                todoData.splice(index, 1);
+                localStorage.setItem('toDo', JSON.stringify(todoData));
             });
 
             li.querySelector('.todo-complete').addEventListener('click', function () {
@@ -38,14 +34,6 @@ let todoControl = document.querySelector('.todo-control'),
                 render();
             });
         });
-    },
-
-    validation = function () {
-        if (headerInput.value === '') {
-            return false;
-        } else {
-            return true;
-        }
     };
 
 if (localStorage.getItem('toDo')) {
@@ -56,7 +44,7 @@ if (localStorage.getItem('toDo')) {
 todoControl.addEventListener('submit', function (event) {
     event.preventDefault();
 
-    if (validation() === true) {
+    if (headerInput.value !== '') {
         const newToDo = {
             text: headerInput.value,
             completed: false,
